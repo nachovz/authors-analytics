@@ -74,6 +74,7 @@ class Authors_Analytics_Admin {
 		 */
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/authors-analytics-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( "aa_bootstrap_css", plugin_dir_url( __FILE__ ) . 'css/bootstrap.min.css', array(), $this->version, 'all' );
 
 	}
 
@@ -97,6 +98,7 @@ class Authors_Analytics_Admin {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/authors-analytics-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( "aa_bootstrap_js", plugin_dir_url( __FILE__ ) . 'js/bootstrap.bundle.min.js', array( 'jquery' ), $this->version, false );
 
 	}
 	
