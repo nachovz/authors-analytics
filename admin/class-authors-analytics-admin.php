@@ -59,7 +59,7 @@ class Authors_Analytics_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles($hook_suffix) {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -72,9 +72,11 @@ class Authors_Analytics_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/authors-analytics-admin.css', array(), $this->version, 'all' );
-		wp_enqueue_style( "aa_bootstrap_css", plugin_dir_url( __FILE__ ) . 'css/bootstrap.min.css', array(), $this->version, 'all' );
+		if($hook_suffix === "authors-analytics/admin/partials/authors-analytics-admin-display.php"){
+			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/authors-analytics-admin.css', array(), $this->version, 'all' );
+			wp_enqueue_style( "aa_bootstrap_css", plugin_dir_url( __FILE__ ) . 'css/bootstrap.min.css', array(), $this->version, 'all' );
+			wp_enqueue_style( "aa_datepicker_css", "https://cdn.jsdelivr.net/npm/gijgo@1.9.3/combined/css/gijgo.min.css", array(), $this->version, 'all');
+		}
 
 	}
 
@@ -83,7 +85,7 @@ class Authors_Analytics_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts($hook_suffix) {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -96,10 +98,11 @@ class Authors_Analytics_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/authors-analytics-admin.js', array( 'jquery' ), $this->version, false );
-		wp_enqueue_script( "aa_bootstrap_js", plugin_dir_url( __FILE__ ) . 'js/bootstrap.bundle.min.js', array( 'jquery' ), $this->version, false );
-
+		if($hook_suffix === "authors-analytics/admin/partials/authors-analytics-admin-display.php"){
+			wp_enqueue_script( "aa_bootstrap_js", plugin_dir_url( __FILE__ ) . 'js/bootstrap.bundle.min.js', array( 'jquery' ), $this->version, false );
+			wp_enqueue_script( "aa_datepicker_js", "https://cdn.jsdelivr.net/npm/gijgo@1.9.3/combined/js/gijgo.min.js", array( 'aa_bootstrap_js'), $this->version, false);
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/authors-analytics-admin.js', array( 'jquery' ), $this->version, false );
+		}
 	}
 	
 	public function my_admin_menu() {
