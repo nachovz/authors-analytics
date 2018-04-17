@@ -87,20 +87,6 @@
             </tr>
         </thead>
         <tbody>
-            <tr id="/">
-                <td>/</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr id="/index.php/biztalk-for-your-organization/">
-                <td>/index.php/biztalk-for-your-organization/</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
         <?php
             $all_users = get_users(['role' => 'contributor']);
             
@@ -217,18 +203,6 @@
                               endwhile;
                           }
                               ?>
-                        {
-                          "dimensionName": "ga:pagePath",
-                          "operator": "EXACT",
-                          "expressions": ["/"]
-                        },
-                        {
-                          "expressions": [
-                            "/index.php/biztalk-for-your-organization/"
-                          ],
-                          "dimensionName": "ga:pagePath",
-                          "operator": "EXACT"
-                        }
                       ]
                     }
                   ]
