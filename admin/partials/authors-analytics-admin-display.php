@@ -95,7 +95,7 @@
                 $author_posts = new WP_Query($author_query);
                 echo    '<tbody>
                             <tr id="tr_'.$a_user->user_nicename.'" class="table-info clickable" data-toggle="collapse" data-target="#'.$a_user->user_nicename.'">
-                                <td colspan="5">'.get_avatar($a_user->ID).' <b>'.$a_user->display_name.'</b></td>
+                                <td>'.get_avatar($a_user->ID).' <b>'.$a_user->display_name.'</b></td><td id="totalPages'.$a_user->user_nicename.'"></td><td id="totalSessions'.$a_user->user_nicename.'"></td><td id="totalBounce'.$a_user->user_nicename.'"></td><td id="totalTime'.$a_user->user_nicename.'"></td>
                             </tr>
                         </tbody>
                         <tbody id="'.$a_user->user_nicename.'" class="collapse">';
@@ -124,6 +124,32 @@
     </table>
     
     <script>
+    
+    class User{
+        
+        constructor(name, posts){
+          this.name = name;
+          this.posts = [];
+          
+          posts.forEach( (post) => {
+            var newPostObject = {};
+            newPostObject.name = post;
+            newPostObject.gaPageViews = 0;
+            newPostObject.gaSessions = 0;
+            newPostObject.gaBounce = 0;
+            newPostObject.gaTime = 0;
+            this.posts.push(newPostObject);
+          });
+          
+        }
+        
+        getPostsList(){
+          let names = [];
+          this.posts.forEach( (post) => names.push(post.name));
+          return names;
+        }
+        
+      }
       // Replace with your view ID.
         var VIEW_ID = '119282868';
         
@@ -150,7 +176,7 @@
         document.getElementById("dateUpdateForm").addEventListener('submit', function(event){
           
           if( event.target[1].valueAsDate > event.target[0].valueAsDate){
-            alert("New dates: "+ event.target[0].value + " to " + event.target[1].value);
+            //alert("New dates: "+ event.target[0].value + " to " + event.target[1].value);
             queryReports("",event.target[0].value, event.target[1].value);
           }else{
             alert("Desde debe ser mayor que hasta");
@@ -158,9 +184,10 @@
           
           event.preventDefault();
         });
-    
-      // Query the API and print the results to the page.
+        
+      //Query the API and print the results to the page.
       function queryReports(token, initDate = DEFAULT_DATE, endDate = TODAY_DATE) {
+        let filters = buildFilters();
         gapi.client.request({
           path: '/v4/reports:batchGet',
           root: 'https://analyticsreporting.googleapis.com/',
@@ -182,28 +209,7 @@
                   "dimensions": [{"name": "ga:pagePath"}],
                   "dimensionFilterClauses": [
                     {
-                      "filters": [
-                          <?php
-                          $all_users = get_users(['role' => 'contributor']);
-                          
-                          foreach($all_users as $a_user){
-                              $author_query = array('posts_per_page' => '-1','author' => $a_user->ID);
-                              $author_posts = new WP_Query($author_query);
-                              while($author_posts->have_posts()) : $author_posts->the_post();
-                              ?>
-                              {
-                                  "dimensionName": "ga:pagePath",
-                                  "operator": "EXACT",
-                                  "expressions": [ "<?php 
-                                  $link = get_permalink();
-                                  echo wp_make_link_relative( $link ); ?>" ]
-                              },
-                              
-                              <?php           
-                              endwhile;
-                          }
-                              ?>
-                      ]
+                      "filters": filters
                     }
                   ]
                 }
@@ -233,6 +239,49 @@
                 return aa_value;
           }
       }
+      
+      var allUsers = [];
+      <?php
+        //$all_users = get_users(['role' => 'contributor']);
+        $all_users = get_users();
+        
+        foreach($all_users as $a_user){
+            $author_query = array('posts_per_page' => '-1','author' => $a_user->ID);
+            $author_posts = new WP_Query($author_query);
+      ?>
+      allUsers.push(new User("<?php echo $a_user->user_nicename; ?>", [ 
+      <?php
+            while($author_posts->have_posts()) : $author_posts->the_post();
+      ?>"<?php 
+                $link = get_permalink();
+                echo wp_make_link_relative( $link ); ?>",
+      <?php           
+            endwhile;
+      ?>
+      ]));
+      <?php
+        }
+      ?>
+      
+      function buildFilters(){
+        let expressions = [];
+        allUsers.forEach( (user) => {
+          expressions = expressions.concat(user.getPostsList());
+        });
+        let filters = [];
+        
+        expressions.forEach( (url) => {
+          filters.push(
+            {
+              "dimensionName": "ga:pagePath",
+              "operator": "EXACT",
+              "expressions": [url]
+          });
+        });
+        
+        return filters;
+      }
+      
     </script>
     
     <!-- Load the JavaScript API client and Sign-in library. -->
